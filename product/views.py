@@ -75,3 +75,84 @@ def userDelete(request):
 
     return HttpResponse(status=200)
 
+# /api/friend/request
+def friendRequest(request):
+    body_unicode = request.body.decode('utf-8')
+    body = json.loads(body_unicode)
+
+    fromUser = User.objects.get(username=body['from'])
+    toUser = User.objects.get(username=body['to'])
+
+    connectionFrom = Connection(toUser=toUser.userName, status=1)
+    connectionTo = Connection(toUser=fromUser.userName, status=0)
+
+    fromUser.listConnection.add(connectionFrom)
+    toUser.listConnection.add(connectionTo)
+
+    fromUser.save()
+    toUser.save()
+
+    return HttpResponse(status=200)
+
+# /api/friend/confirm
+def friendConfirm(request):
+    body_unicode = request.body.decode('utf-8')
+    body = json.loads(body_unicode)
+
+    fromUser = User.objects.get(username=body['from'])
+    toUser = User.objects.get(username=body['to'])
+
+    for connection in fromUser.listConnection:
+        if(connection.toUser == toUser.userName):
+            connection.status = 2
+            break
+
+    for connection in toUser.listConnection:
+        if(connection.toUser == fromUser.userName):
+            connection.status = 2
+            break
+
+    fromUser.save()
+    toUser.save()
+
+    return HttpResponse(status=200)
+
+
+# /api/friend/delete
+def friendIgnore(request):
+    body_unicode = request.body.decode('utf-8')
+    body = json.loads(body_unicode)
+
+    fromUser = User.objects.get(username=body['from'])
+    toUser = User.objects.get(username=body['to'])
+
+    for connection in fromUser.listConnection:
+        if(connection.toUser == toUser.userName):
+            fromUser.listConnection.remove(connection)
+
+    for connection in toUser.listConnection:
+        if(connection.toUser == fromUser.userName):
+            toUser.listConnection.remove(connection)
+
+    fromUser.save()
+    toUser.save()
+
+    return HttpResponse(status=200)
+
+
+
+# /api/friend/get
+# status :(0, 'REQUEST'), (1, 'PENDING'), (2, 'ACCEPT'), (3, 'BLOCK'),
+def friendGet(request):
+    body_unicode = request.body.decode('utf-8')
+    body = json.loads(body_unicode)
+
+    user = User.objects.get(username=body['from'])
+
+    result = []
+    for connection in user.listConnection:
+        if(connection.status == body['status']):
+            result.append(User.objects.get(connection.toUser).json())
+
+    return JsonResponse(result)
+

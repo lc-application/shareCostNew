@@ -3,6 +3,19 @@ from phonenumber_field.modelfields import PhoneNumberField
 # Create your models here.
 
 
+class Connection(models.Model):
+    toUser = models.CharField(max_length=30)
+    CONNECTION_STATUS = {
+        (0, 'REQUEST'),
+        (1, 'PENDING'),
+        (2, 'ACCEPT'),
+        (3, 'BLOCK'),
+    }
+    status = models.IntegerField(choices=CONNECTION_STATUS, default=0)
+    createDate = models.DateTimeField(auto_now_add=True)
+    updateDate = models.DateTimeField(auto_now=True)
+
+
 class User(models.Model):
     firstName = models.CharField(max_length=30)
     lastName = models.CharField(max_length=30)
@@ -12,7 +25,9 @@ class User(models.Model):
     phone = PhoneNumberField(unique=True)
     createDate = models.DateTimeField(auto_now_add=True)
     updateDate = models.DateTimeField(auto_now=True)
-
+    listConnection = models.ManyToManyField(
+        Connection,
+    )
     def json(self):
         result = {'firstname': self.firstName,
                   'lastname': self.lastName,
@@ -48,19 +63,6 @@ class Transaction(models.Model):
                   'create':self.createDate,
                   'update':self.updateDate}
         return result
-
-
-class Connection(models.Model):
-    fromUser = models.ForeignKey(User, on_delete=models.CASCADE, related_name='connectionFromUser')
-    toUser = models.ForeignKey(User, on_delete=models.CASCADE, related_name='connectionToUser')
-    CONNECTION_STATUS = {
-        (0, 'REQUEST'),
-        (1, 'ACCEPT'),
-        (2, 'BLOCK'),
-    }
-    status = models.IntegerField(choices=CONNECTION_STATUS, default=0)
-    createDate = models.DateTimeField(auto_now_add=True)
-    updateDate = models.DateTimeField(auto_now=True)
 
 
 class Chat(models.Model):
