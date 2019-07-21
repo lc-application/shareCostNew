@@ -22,11 +22,19 @@ from product.views import userCreate
 from product.views import userUpdate
 from product.views import userDelete
 
+from product.views import friendRequest
+from product.views import friendConfirm
+from product.views import friendDelete
+from product.views import friendGet
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('hello/', hello),
     path('api/user/userlogin', userLogin),
     path('api/user/usercreate', userCreate),
     path('api/user/userupdate', userUpdate),
-    path('api/user/userdelete', userDelete)
+    path('api/user/userdelete', userDelete),
+    path('api/friend/request', friendRequest),
+    path('api/friend/confirm', friendConfirm),
+    path('api/friend/delete', friendDelete),
+    path('api/friend/get', friendGet)
 ]

@@ -3,3 +3,4 @@
 .idea/
 /product/migrations/
 /product/__pycache__/
+db.sqlite3

@@ -119,7 +119,7 @@ def friendConfirm(request):
 
 
 # /api/friend/delete
-def friendIgnore(request):
+def friendDelete(request):
     body_unicode = request.body.decode('utf-8')
     body = json.loads(body_unicode)
 
