@@ -6,12 +6,20 @@ from phonenumber_field.modelfields import PhoneNumberField
 class User(models.Model):
     firstName = models.CharField(max_length=30)
     lastName = models.CharField(max_length=30)
-    userName = models.CharField(max_length=30)
+    userName = models.CharField(max_length=30, unique=True)
     password = models.CharField(max_length=30)
     email = models.EmailField(unique=True)
     phone = PhoneNumberField(unique=True)
     createDate = models.DateTimeField(auto_now_add=True)
     updateDate = models.DateTimeField(auto_now=True)
+
+    def json(self):
+        result = {'firstname': self.firstName,
+                  'lastname': self.lastName,
+                  'email': self.email,
+                  'phone': self.phone.__str__(),
+                  'username': self.userName}
+        return result
 
 
 class Transaction(models.Model):
@@ -29,6 +37,17 @@ class Transaction(models.Model):
     status = models.IntegerField(choices=TRANSACTION_STATUS, default=0)
     createDate = models.DateTimeField(auto_now_add=True)
     updateDate = models.DateTimeField(auto_now=True)
+
+    def json(self):
+        result = {'from':self.fromUser,
+                  'to':self.toUser,
+                  'value':self.value,
+                  'title':self.title,
+                  'comment':self.comment,
+                  'status':self.status,
+                  'create':self.createDate,
+                  'update':self.updateDate}
+        return result
 
 
 class Connection(models.Model):

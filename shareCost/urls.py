@@ -17,8 +17,16 @@ from django.contrib import admin
 from django.urls import path
 from product.views import hello
 
+from product.views import userLogin
+from product.views import userCreate
+from product.views import userUpdate
+from product.views import userDelete
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('hello/', hello),
+    path('api/user/userlogin', userLogin),
+    path('api/user/usercreate', userCreate),
+    path('api/user/userupdate', userUpdate),
+    path('api/user/userdelete', userDelete)
 ]
