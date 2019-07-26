@@ -21,19 +21,23 @@ class User(models.Model):
     lastName = models.CharField(max_length=30)
     userName = models.CharField(max_length=30, unique=True)
     password = models.CharField(max_length=30)
-    email = models.EmailField(unique=True)
-    phone = PhoneNumberField(unique=True)
+    email = models.EmailField(unique=True, blank=True)
+    phone = PhoneNumberField(unique=True, blank=True)
     createDate = models.DateTimeField(auto_now_add=True)
     updateDate = models.DateTimeField(auto_now=True)
     listConnection = models.ManyToManyField(
         Connection,
+        blank=True
     )
+    image = models.ImageField(upload_to="UserImage",blank=True)
+
     def json(self):
         result = {'firstname': self.firstName,
                   'lastname': self.lastName,
                   'email': self.email,
                   'phone': self.phone.__str__(),
-                  'username': self.userName}
+                  'username': self.userName,
+                  'image':self.image.path}
         return result
 
 
@@ -72,3 +76,28 @@ class Chat(models.Model):
     )
     createDate = models.DateTimeField(auto_now_add=True)
     updateDate = models.DateTimeField(auto_now=True)
+
+
+class Event(models.Model):
+    title = models.CharField(max_length=30)
+    summary = models.CharField(max_length=200)
+    hostUser = models.ForeignKey(User, on_delete=models.CASCADE, related_name='host')
+    startTime = models.DateTimeField()
+    endTime = models.DateField()
+    listUser = models.ManyToManyField(
+        User
+    )
+    image = models.ImageField(upload_to="EventImage")
+    createDate = models.DateTimeField(auto_now_add=True)
+
+    def json(self):
+        result = {
+            'title':self.title,
+            'summary':self.summary,
+            'hostUser':self.hostUser.json(),
+            'startTime':self.startTime,
+            'endTime':self.endTime,
+            'listUser':self.listUser,
+            'image':self.image.path
+        }
+        return result

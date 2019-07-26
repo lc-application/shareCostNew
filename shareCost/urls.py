@@ -13,9 +13,12 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
+from django.conf.urls import url
+from django.conf.urls.static import static
 from django.contrib import admin
 from django.urls import path
 from product.views import hello
+from shareCost import settings
 
 from product.views import userLogin
 from product.views import userCreate
@@ -26,6 +29,7 @@ from product.views import friendRequest
 from product.views import friendConfirm
 from product.views import friendDelete
 from product.views import friendGet
+
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('hello/', hello),
@@ -36,5 +40,8 @@ urlpatterns = [
     path('api/friend/request', friendRequest),
     path('api/friend/confirm', friendConfirm),
     path('api/friend/delete', friendDelete),
-    path('api/friend/get', friendGet)
+    path('api/friend/get', friendGet),
+    url(r'^admin/', admin.site.urls),
 ]
+
+urlpatterns += static(settings.MEDIA_URL, document_root = settings.MEDIA_ROOT)

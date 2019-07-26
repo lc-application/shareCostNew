@@ -6,6 +6,7 @@ from django.http import HttpResponse, JsonResponse
 # Create your views here.
 from django.template import RequestContext
 from django.template.context_processors import csrf
+from django.core import files
 
 from product.models import User
 from product.models import Transaction
@@ -42,7 +43,8 @@ def userCreate(request):
                 lastName=body['lastname'],
                 password=body['password'],
                 phone=body['phone'],
-                email=body['email'])
+                email=body['email'],
+                image=request.FILES)
 
     try:
         user.save()
@@ -62,6 +64,7 @@ def userUpdate(request):
         password=body['password'],
         phone=body['phone'],
         email=body['email'],
+        image=request.FILES
     )
 
     return HttpResponse(status=200)
@@ -155,4 +158,3 @@ def friendGet(request):
             result.append(User.objects.get(connection.toUser).json())
 
     return JsonResponse(result)
-
