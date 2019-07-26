@@ -21,13 +21,14 @@ class User(models.Model):
     lastName = models.CharField(max_length=30)
     userName = models.CharField(max_length=30, unique=True)
     password = models.CharField(max_length=30)
-    email = models.EmailField(unique=True, blank=True)
-    phone = PhoneNumberField(unique=True, blank=True)
+    email = models.EmailField(unique=True, blank=True, null=True)
+    phone = PhoneNumberField(unique=True, blank=True, null=True)
     createDate = models.DateTimeField(auto_now_add=True)
     updateDate = models.DateTimeField(auto_now=True)
     listConnection = models.ManyToManyField(
         Connection,
-        blank=True
+        blank=True,
+        null=True
     )
     image = models.ImageField(upload_to="UserImage",blank=True)
 
