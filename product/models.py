@@ -34,12 +34,15 @@ class User(models.Model):
     image = models.ImageField(upload_to="UserImage",blank=True)
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
 
+    def friendJson(self):
+        return {'id': self.id, 'firstname': self.firstName, 'lastname': self.lastName, 'username': self.userName}
+
     def json(self):
         connections = []
         for connection in self.listConnection.all():
             toUser = User.objects.filter(userName=connection.toUser)[0]
-            userJson = {'id': toUser.id, 'firstname': toUser.firstName, 'lastname': toUser.lastName, 'username': toUser.userName}
-            connections.append({"user":userJson, "status":connection.status})
+            userJson = toUser.friendJson()
+            connections.append({"user":userJson, "status":str(connection.status)})
         result = {'firstname': self.firstName,
                   'lastname': self.lastName,
                   'email': self.email,
