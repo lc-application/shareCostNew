@@ -108,12 +108,12 @@ def friendConfirm(request):
     fromUser = User.objects.get(userName=body['from'])
     toUser = User.objects.get(userName=body['to'])
 
-    for connection in fromUser.listConnection:
+    for connection in fromUser.listConnection.all():
         if(connection.toUser == toUser.userName):
             connection.status = 2
             break
 
-    for connection in toUser.listConnection:
+    for connection in toUser.listConnection.all():
         if(connection.toUser == fromUser.userName):
             connection.status = 2
             break
@@ -132,11 +132,11 @@ def friendDelete(request):
     fromUser = User.objects.get(userName=body['from'])
     toUser = User.objects.get(userName=body['to'])
 
-    for connection in fromUser.listConnection:
+    for connection in fromUser.listConnection.all():
         if(connection.toUser == toUser.userName):
             fromUser.listConnection.remove(connection)
 
-    for connection in toUser.listConnection:
+    for connection in toUser.listConnection.all():
         if(connection.toUser == fromUser.userName):
             toUser.listConnection.remove(connection)
 
@@ -153,14 +153,14 @@ def friendGet(request):
     body_unicode = request.body.decode('utf-8')
     body = json.loads(body_unicode)
 
-    user = User.objects.get(userName=body['from'])
+    user = User.objects.get(id=body['from'])
 
     result = []
-    for connection in user.listConnection:
-        if(connection.status == body['status']):
-            result.append(User.objects.get(connection.toUser).json())
+    for connection in user.listConnection.all():
+        if(str(connection.status) == body['status']):
+            result.append((User.objects.filter(userName=connection.toUser)[0]).friendJson())
 
-    return JsonResponse(result)
+    return JsonResponse(result, safe=False)
 
 # /api/connection/get
 def allConnections(request):
