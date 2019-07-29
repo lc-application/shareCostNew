@@ -35,17 +35,21 @@ class User(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
 
     def json(self):
+        connections = []
+        for connection in self.listConnection.all():
+            toUser = User.objects.filter(userName=connection.toUser)[0]
+            userJson = {'id': toUser.id, 'firstname': toUser.firstName, 'lastname': toUser.lastName, 'username': toUser.userName}
+            connections.append({"user":userJson, "status":connection.status})
         result = {'firstname': self.firstName,
                   'lastname': self.lastName,
                   'email': self.email,
                   'phone': self.phone.__str__(),
                   'username': self.userName,
                   'id': self.id,
-                  'listConnect': listConnection}
+                  'listConnection': connections}
         # if bool(self.image):
         #     result['image'] = self.image.path
         return result
-
 
 class Transaction(models.Model):
     fromUser = models.ForeignKey(User, on_delete=models.DO_NOTHING, related_name='transactionFromUser')
