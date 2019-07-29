@@ -58,7 +58,7 @@ def userUpdate(request):
     body_unicode = request.body.decode('utf-8')
     body = json.loads(body_unicode)
 
-    User.objects.filter(username=body['username']).update(
+    User.objects.filter(userName=body['username']).update(
         firstName=body['firstname'],
         lastName=body['lastname'],
         password=body['password'],
@@ -74,7 +74,7 @@ def userDelete(request):
     body_unicode = request.body.decode('utf-8')
     body = json.loads(body_unicode)
 
-    User.objects.filter(username=body['username']).delete()
+    User.objects.filter(userName=body['username']).delete()
 
     return HttpResponse(status=200)
 
@@ -83,11 +83,14 @@ def friendRequest(request):
     body_unicode = request.body.decode('utf-8')
     body = json.loads(body_unicode)
 
-    fromUser = User.objects.get(username=body['from'])
-    toUser = User.objects.get(username=body['to'])
+    # From is a user id, to is a username.
+    fromUser = User.objects.get(id=body['from'])
+    toUser = User.objects.get(userName=body['to'])
 
     connectionFrom = Connection(toUser=toUser.userName, status=1)
     connectionTo = Connection(toUser=fromUser.userName, status=0)
+    connectionFrom.save()
+    connectionTo.save()
 
     fromUser.listConnection.add(connectionFrom)
     toUser.listConnection.add(connectionTo)
@@ -102,8 +105,8 @@ def friendConfirm(request):
     body_unicode = request.body.decode('utf-8')
     body = json.loads(body_unicode)
 
-    fromUser = User.objects.get(username=body['from'])
-    toUser = User.objects.get(username=body['to'])
+    fromUser = User.objects.get(userName=body['from'])
+    toUser = User.objects.get(userName=body['to'])
 
     for connection in fromUser.listConnection:
         if(connection.toUser == toUser.userName):
@@ -126,8 +129,8 @@ def friendDelete(request):
     body_unicode = request.body.decode('utf-8')
     body = json.loads(body_unicode)
 
-    fromUser = User.objects.get(username=body['from'])
-    toUser = User.objects.get(username=body['to'])
+    fromUser = User.objects.get(userName=body['from'])
+    toUser = User.objects.get(userName=body['to'])
 
     for connection in fromUser.listConnection:
         if(connection.toUser == toUser.userName):
@@ -150,7 +153,7 @@ def friendGet(request):
     body_unicode = request.body.decode('utf-8')
     body = json.loads(body_unicode)
 
-    user = User.objects.get(username=body['from'])
+    user = User.objects.get(userName=body['from'])
 
     result = []
     for connection in user.listConnection:
@@ -158,3 +161,11 @@ def friendGet(request):
             result.append(User.objects.get(connection.toUser).json())
 
     return JsonResponse(result)
+
+# /api/connection/get
+def allConnections(request):
+    body_unicode = request.body.decode('utf-8')
+    body = json.loads(body_unicode)
+
+    user = User.objects.get(id=body['identifier'])
+    return JsonResponse(user.listConnection)

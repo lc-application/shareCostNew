@@ -1,3 +1,4 @@
+import uuid
 from django.db import models
 from phonenumber_field.modelfields import PhoneNumberField
 # Create your models here.
@@ -31,6 +32,7 @@ class User(models.Model):
         null=True
     )
     image = models.ImageField(upload_to="UserImage",blank=True)
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
 
     def json(self):
         result = {'firstname': self.firstName,
@@ -38,7 +40,10 @@ class User(models.Model):
                   'email': self.email,
                   'phone': self.phone.__str__(),
                   'username': self.userName,
-                  'image':self.image.path}
+                  'id': self.id,
+                  'listConnect': listConnection}
+        # if bool(self.image):
+        #     result['image'] = self.image.path
         return result
 
 
@@ -57,6 +62,7 @@ class Transaction(models.Model):
     status = models.IntegerField(choices=TRANSACTION_STATUS, default=0)
     createDate = models.DateTimeField(auto_now_add=True)
     updateDate = models.DateTimeField(auto_now=True)
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
 
     def json(self):
         result = {'from':self.fromUser,
@@ -90,6 +96,8 @@ class Event(models.Model):
     )
     image = models.ImageField(upload_to="EventImage")
     createDate = models.DateTimeField(auto_now_add=True)
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+
 
     def json(self):
         result = {
