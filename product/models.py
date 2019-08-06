@@ -4,8 +4,25 @@ from phonenumber_field.modelfields import PhoneNumberField
 # Create your models here.
 
 
+class BaseUser(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    firstName = models.CharField(max_length=30)
+    lastName = models.CharField(max_length=30)
+    userName = models.CharField(max_length=30, unique=True)
+    image = models.ImageField(upload_to="UserImage",blank=True)
+
+    def json(self):
+        result = {'id': self.id,
+                'firstname': self.firstName,
+                'lastname': self.lastName,
+                'username': self.userName
+                ##'image':self.image.path
+        }
+        return result
+
+
 class Connection(models.Model):
-    toUser = models.CharField(max_length=30)
+    toUser = models.ForeignKey(BaseUser, on_delete=models.CASCADE)
     CONNECTION_STATUS = {
         (0, 'REQUEST'),
         (1, 'PENDING'),
@@ -16,47 +33,17 @@ class Connection(models.Model):
     createDate = models.DateTimeField(auto_now_add=True)
     updateDate = models.DateTimeField(auto_now=True)
 
-
-class User(models.Model):
-    firstName = models.CharField(max_length=30)
-    lastName = models.CharField(max_length=30)
-    userName = models.CharField(max_length=30, unique=True)
-    password = models.CharField(max_length=30)
-    email = models.EmailField(unique=True, blank=True, null=True)
-    phone = PhoneNumberField(unique=True, blank=True, null=True)
-    createDate = models.DateTimeField(auto_now_add=True)
-    updateDate = models.DateTimeField(auto_now=True)
-    listConnection = models.ManyToManyField(
-        Connection,
-        blank=True,
-        null=True
-    )
-    image = models.ImageField(upload_to="UserImage",blank=True)
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-
-    def friendJson(self):
-        return {'id': self.id, 'firstname': self.firstName, 'lastname': self.lastName, 'username': self.userName}
-
     def json(self):
-        connections = []
-        for connection in self.listConnection.all():
-            toUser = User.objects.filter(userName=connection.toUser)[0]
-            userJson = toUser.friendJson()
-            connections.append({"user":userJson, "status":str(connection.status)})
-        result = {'firstname': self.firstName,
-                  'lastname': self.lastName,
-                  'email': self.email,
-                  'phone': self.phone.__str__(),
-                  'username': self.userName,
-                  'id': self.id,
-                  'listConnection': connections}
-        # if bool(self.image):
-        #     result['image'] = self.image.path
+        result = {
+            'user':self.toUser.json(),
+            'status':str(self.status)
+        }
         return result
 
+
 class Transaction(models.Model):
-    fromUser = models.ForeignKey(User, on_delete=models.DO_NOTHING, related_name='transactionFromUser')
-    toUser = models.ForeignKey(User, on_delete=models.DO_NOTHING, related_name='transactionToUser')
+    fromUser = models.ForeignKey(BaseUser, on_delete=models.DO_NOTHING, related_name='transactionFromUser')
+    toUser = models.ForeignKey(BaseUser, on_delete=models.DO_NOTHING, related_name='transactionToUser')
     value = models.FloatField()
     title = models.CharField(max_length=30)
     comment = models.CharField(max_length=200)
@@ -86,7 +73,7 @@ class Transaction(models.Model):
 class Chat(models.Model):
     title = models.CharField(max_length=30)
     listUser = models.ManyToManyField(
-        User,
+        BaseUser
     )
     createDate = models.DateTimeField(auto_now_add=True)
     updateDate = models.DateTimeField(auto_now=True)
@@ -95,16 +82,15 @@ class Chat(models.Model):
 class Event(models.Model):
     title = models.CharField(max_length=30)
     summary = models.CharField(max_length=200)
-    hostUser = models.ForeignKey(User, on_delete=models.CASCADE, related_name='host')
+    hostUser = models.ForeignKey(BaseUser, on_delete=models.CASCADE, related_name='host')
     startTime = models.DateTimeField()
     endTime = models.DateField()
     listUser = models.ManyToManyField(
-        User
+        BaseUser
     )
-    image = models.ImageField(upload_to="EventImage")
+    image = models.ImageField(upload_to="EventImage", blank=True, null=True)
     createDate = models.DateTimeField(auto_now_add=True)
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-
 
     def json(self):
         result = {
@@ -116,4 +102,36 @@ class Event(models.Model):
             'listUser':self.listUser,
             'image':self.image.path
         }
+        return result
+
+
+class User(models.Model):
+    base = models.OneToOneField(BaseUser, on_delete=models.CASCADE, primary_key=True, unique=True)
+    password = models.CharField(max_length=30)
+    email = models.EmailField(unique=True, blank=True, null=True)
+    phone = PhoneNumberField(unique=True, blank=True, null=True)
+    createDate = models.DateTimeField(auto_now_add=True)
+    updateDate = models.DateTimeField(auto_now=True)
+    listConnection = models.ManyToManyField(
+        Connection,
+        blank=True,
+    )
+
+    listEvent = models.ManyToManyField(
+        Event,
+        blank=True,
+    )
+
+    def baseJson(self):
+        return self.base.json()
+
+    def json(self):
+        connections = []
+        for connection in self.listConnection.all():
+            connections.append(connection.json())
+
+        result = self.baseJson()
+        result['email'] = self.email
+        result['phone'] = self.phone.__str__()
+        result['listConnection'] = connections
         return result
