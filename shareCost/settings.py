@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     # third-party
     'phonenumber_field',
+    'django_extensions',
     # own
     'product',
 ]

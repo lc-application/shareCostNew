@@ -40,8 +40,8 @@ urlpatterns = [
     path('api/friend/request', friendRequest),
     path('api/friend/confirm', friendConfirm),
     path('api/friend/delete', friendDelete),
-    path('api/friend/get', friendGet),
-    url(r'^admin/', admin.site.urls),
+    path('api/friend/friendGet', friendGet),
+    # url(r'^admin/', admin.site.urls),
 ]
 
 urlpatterns += static(settings.MEDIA_URL, document_root = settings.MEDIA_ROOT)

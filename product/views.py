@@ -146,9 +146,8 @@ def friendDelete(request):
     return HttpResponse(status=200)
 
 
-
-# /api/friend/get
-# status :(0, 'REQUEST'), (1, 'PENDING'), (2, 'ACCEPT'), (3, 'BLOCK'),
+# /api/friend/friendGet
+# status :(0, 'REQUEST'), (1, 'ACCEPT'), (2, 'BLOCK'),
 def friendGet(request):
     body_unicode = request.body.decode('utf-8')
     body = json.loads(body_unicode)
@@ -156,9 +155,18 @@ def friendGet(request):
     user = User.objects.get(id=body['from'])
 
     result = []
-    for connection in user.listConnection.all():
-        if(str(connection.status) == body['status']):
-            result.append((User.objects.filter(userName=connection.toUser)[0]).friendJson())
+    all_connections = user.received_connections.all() | user.sent_connections.all()
+    for connection in all_connections:
+        from_user = connection.fromUser
+        to_user = connection.toUser
+        if body['status'] == "1" and str(connection.status) == "1":
+            if from_user.id == user.id:
+                result.append(to_user.friendJson())
+            else:
+                result.append(from_user.friendJson())
+        elif body['status'] == str(connection.status):
+            if from_user.id == user.id:
+                result.append(to_user.friendJson())
 
     return JsonResponse(result, safe=False)
 

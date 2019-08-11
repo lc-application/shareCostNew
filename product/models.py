@@ -3,20 +3,6 @@ from django.db import models
 from phonenumber_field.modelfields import PhoneNumberField
 # Create your models here.
 
-
-class Connection(models.Model):
-    toUser = models.CharField(max_length=30)
-    CONNECTION_STATUS = {
-        (0, 'REQUEST'),
-        (1, 'PENDING'),
-        (2, 'ACCEPT'),
-        (3, 'BLOCK'),
-    }
-    status = models.IntegerField(choices=CONNECTION_STATUS, default=0)
-    createDate = models.DateTimeField(auto_now_add=True)
-    updateDate = models.DateTimeField(auto_now=True)
-
-
 class User(models.Model):
     firstName = models.CharField(max_length=30)
     lastName = models.CharField(max_length=30)
@@ -26,11 +12,6 @@ class User(models.Model):
     phone = PhoneNumberField(unique=True, blank=True, null=True)
     createDate = models.DateTimeField(auto_now_add=True)
     updateDate = models.DateTimeField(auto_now=True)
-    listConnection = models.ManyToManyField(
-        Connection,
-        blank=True,
-        null=True
-    )
     image = models.ImageField(upload_to="UserImage",blank=True)
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
 
@@ -39,9 +20,9 @@ class User(models.Model):
 
     def json(self):
         connections = []
-        for connection in self.listConnection.all():
-            toUser = User.objects.filter(userName=connection.toUser)[0]
-            userJson = toUser.friendJson()
+        all_connections = self.received_connections.all() | self.sent_connections.all()
+        for connection in all_connections:
+            userJson = connection.toUser.friendJson()
             connections.append({"user":userJson, "status":str(connection.status)})
         result = {'firstname': self.firstName,
                   'lastname': self.lastName,
@@ -53,6 +34,25 @@ class User(models.Model):
         # if bool(self.image):
         #     result['image'] = self.image.path
         return result
+
+    def __str__(self):
+        return 'User: ' + self.firstName
+
+class Connection(models.Model):
+    toUser = models.ForeignKey(User, on_delete=models.CASCADE, related_name="received_connections")
+    fromUser = models.ForeignKey(User, on_delete=models.CASCADE, related_name="sent_connections")
+    CONNECTION_STATUS = {
+        (0, 'PENDING'),
+        (1, 'ACCEPT'),
+        (2, 'BLOCK'),
+    }
+    status = models.IntegerField(choices=CONNECTION_STATUS, default=0)
+    createDate = models.DateTimeField(auto_now_add=True)
+    updateDate = models.DateTimeField(auto_now=True)
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+
+    def __str__(self):
+        return 'Connection from: ' + self.fromUser.firstName + '. to: ' + self.toUser.firstName + '. Status: ' + str(self.get_status_display())
 
 class Transaction(models.Model):
     fromUser = models.ForeignKey(User, on_delete=models.DO_NOTHING, related_name='transactionFromUser')
