@@ -22,28 +22,23 @@ class BaseUser(models.Model):
 
 
 class Connection(models.Model):
-    toUser = models.ForeignKey(BaseUser, on_delete=models.CASCADE, related_name="received_connections")
-    fromUser = models.ForeignKey(BaseUser, on_delete=models.CASCADE, related_name="sent_connections")
+    toUser = models.ForeignKey(BaseUser, on_delete=models.CASCADE)
     CONNECTION_STATUS = {
-        (0, 'PENDING'),
-        (1, 'ACCEPT'),
-        (2, 'BLOCK'),
+        (0, 'REQUEST'),
+        (1, 'PENDING'),
+        (2, 'ACCEPT'),
+        (3, 'BLOCK'),
     }
     status = models.IntegerField(choices=CONNECTION_STATUS, default=0)
     createDate = models.DateTimeField(auto_now_add=True)
     updateDate = models.DateTimeField(auto_now=True)
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
 
     def json(self):
         result = {
-            'from':self.fromUser.json(),
-            'to':self.toUser.json(),
-            'status': self.status.__str__(),
+            'user':self.toUser.json(),
+            'status':str(self.status)
         }
         return result
-
-    def __str__(self):
-        return 'Connection from: ' + self.fromUser.firstName + '. to: ' + self.toUser.firstName + '. Status: ' + str(self.get_status_display())
 
 
 class Transaction(models.Model):
@@ -117,6 +112,10 @@ class User(models.Model):
     phone = PhoneNumberField(unique=True, blank=True, null=True)
     createDate = models.DateTimeField(auto_now_add=True)
     updateDate = models.DateTimeField(auto_now=True)
+    listConnection = models.ManyToManyField(
+        Connection,
+        blank=True,
+    )
 
     listEvent = models.ManyToManyField(
         Event,
@@ -128,8 +127,7 @@ class User(models.Model):
 
     def json(self):
         connections = []
-        all_connections = self.received_connections.all() | self.sent_connections.all()
-        for connection in all_connections:
+        for connection in self.listConnection.all():
             connections.append(connection.json())
 
         result = self.baseJson()
@@ -137,6 +135,3 @@ class User(models.Model):
         result['phone'] = self.phone.__str__()
         result['listConnection'] = connections
         return result
-
-    def __str__(self):
-        return 'User: ' + self.base.userName
