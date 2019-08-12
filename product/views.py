@@ -13,6 +13,7 @@ from product.models import User
 from product.models import Transaction
 from product.models import Connection
 from product.models import Chat
+from product.models import Event
 
 
 def hello(request):
@@ -174,4 +175,47 @@ def allConnections(request):
 
     user = User.objects.get(base__id=body['identifier'])
     return JsonResponse(user.listConnection)
+
+# /api/event/allEvents
+def allEvents(request):
+    body_unicode = request.body.decode('utf-8')
+    body = json.loads(body_unicode)
+
+    user = User.objects.get(base__id=body['user_id'])
+    result = []
+    for event in user.base.event_set.all():
+        result.append(event.header())
+    return JsonResponse(result, safe=False)
+
+# /api/event/joinEvent
+def joinEvent(request):
+    body_unicode = request.body.decode('utf-8')
+    body = json.loads(body_unicode)
+
+    event = Event.objects.get(base__id=body['event_id'])
+    user = User.objects.get(base__id=body['user_id'])
+    event.listUser.add(user)
+    return HttpResponse(status=200)
+
+
+# /api/event/eventDetail
+def eventDetail(request):
+    body_unicode = request.body.decode('utf-8')
+    body = json.loads(body_unicode)
+
+    event = Event.objects.get(base__id=body['event_id'])
+
+    return JsonResponse(event.json())
+
+
+# /api/event/removeFromEvent
+def removeFromEvent(request):
+    body_unicode = request.body.decode('utf-8')
+    body = json.loads(body_unicode)
+
+    event = Event.objects.get(base__id=body['event_id'])
+    user = User.objects.get(base__id=body['user_id'])
+    if user in event.listUser.all():
+        event.listUser.delete(user)
+    return HttpResponse(status=200)
 
