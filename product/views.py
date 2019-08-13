@@ -89,9 +89,8 @@ def friendRequest(request, userfrom, userto):
 
     try:
         fromUser.listRequest.add(toUser)
-        toUser.listPendRequest.add(fromUser)
-
         fromUser.save()
+        toUser.listPendRequest.add(fromUser)
         toUser.save()
     except:
         return HttpResponse(status=400)
@@ -109,7 +108,7 @@ def friendConfirm(request, userfrom, userto):
         fromUser.listFriend.add(toUser)
 
         toUser.listRequest.remove(fromUser)
-        toUser.listRequest.add(fromUser)
+        toUser.listFriend.add(fromUser)
 
         fromUser.save()
         toUser.save()
