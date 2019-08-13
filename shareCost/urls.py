@@ -28,19 +28,24 @@ from product.views import userDelete
 from product.views import friendRequest
 from product.views import friendConfirm
 from product.views import friendDelete
-from product.views import friendGet
 
+
+from product.views import relationGetFriend
+from product.views import relationGetPending
+from product.views import relationGetRequest
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('hello/', hello),
     path('api/user/userlogin', userLogin),
     path('api/user/usercreate', userCreate),
     path('api/user/userupdate', userUpdate),
-    path('api/user/userdelete', userDelete),
-    path('api/friend/request', friendRequest),
-    path('api/friend/confirm', friendConfirm),
-    path('api/friend/delete', friendDelete),
-    path('api/friend/get', friendGet),
+    path('api/user/userdelete/<userid>', userDelete),
+    path('api/friend/request/<userfrom>/<userto>', friendRequest),
+    path('api/friend/confirm/<userfrom>/<userto>', friendConfirm),
+    path('api/friend/delete/<userfrom>/<userto>', friendDelete),
+    path('api/friend/getfriend/<userid>', relationGetFriend),
+    path('api/friend/getpending/<userid>', relationGetPending),
+    path('api/friend/getrequest/<userid>', relationGetRequest),
     url(r'^admin/', admin.site.urls),
 ]
 

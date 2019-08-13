@@ -21,26 +21,6 @@ class BaseUser(models.Model):
         return result
 
 
-class Connection(models.Model):
-    toUser = models.ForeignKey(BaseUser, on_delete=models.CASCADE)
-    CONNECTION_STATUS = {
-        (0, 'REQUEST'),
-        (1, 'PENDING'),
-        (2, 'ACCEPT'),
-        (3, 'BLOCK'),
-    }
-    status = models.IntegerField(choices=CONNECTION_STATUS, default=0)
-    createDate = models.DateTimeField(auto_now_add=True)
-    updateDate = models.DateTimeField(auto_now=True)
-
-    def json(self):
-        result = {
-            'user':self.toUser.json(),
-            'status':str(self.status)
-        }
-        return result
-
-
 class Transaction(models.Model):
     fromUser = models.ForeignKey(BaseUser, on_delete=models.DO_NOTHING, related_name='transactionFromUser')
     toUser = models.ForeignKey(BaseUser, on_delete=models.DO_NOTHING, related_name='transactionToUser')
@@ -112,10 +92,10 @@ class User(models.Model):
     phone = PhoneNumberField(unique=True, blank=True, null=True)
     createDate = models.DateTimeField(auto_now_add=True)
     updateDate = models.DateTimeField(auto_now=True)
-    listConnection = models.ManyToManyField(
-        Connection,
-        blank=True,
-    )
+    listFriend = models.ManyToManyField('self')
+    listBlock = models.ManyToManyField('self')
+    listRequest = models.ManyToManyField('self')
+    listPendRequest = models.ManyToManyField('self')
 
     listEvent = models.ManyToManyField(
         Event,
@@ -125,13 +105,18 @@ class User(models.Model):
     def baseJson(self):
         return self.base.json()
 
-    def json(self):
-        connections = []
-        for connection in self.listConnection.all():
-            connections.append(connection.json())
+    def listUserToJson(self, list):
+        result = []
+        for user in list:
+            result.append(user.baseJson())
+        return result
 
+    def json(self):
         result = self.baseJson()
         result['email'] = self.email
         result['phone'] = self.phone.__str__()
-        result['listConnection'] = connections
+        result['listFriend'] = self.listUserToJson(self.listFriend.all())
+        result['listBlock'] = self.listUserToJson(self.listBlock.all())
+        result['listRequest'] = self.listUserToJson(self.listRequest.all())
+        result['listPendRequest'] = self.listUserToJson(self.listPendRequest.all())
         return result
