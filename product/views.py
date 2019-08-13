@@ -39,8 +39,8 @@ def userCreate(request):
     body = json.loads(body_unicode)
     base = BaseUser(userName=body['username'],
                     firstName=body['firstname'],
-                    lastName=body['lastname'],
-                    image=request.FILES)
+                    lastName=body['lastname'])
+                    #image=request.FILES)
     user = User(base=base,
                 password=body['password'],
                 phone=body['phone'],
@@ -51,6 +51,9 @@ def userCreate(request):
         base.save()
         user.save()
     except IntegrityError or ValueError as err:
+        print(err)
+        base.delete()
+        user.delete()
         return HttpResponse(status=400)
 
     return HttpResponse(status=200)
