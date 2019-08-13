@@ -92,9 +92,9 @@ while x < USER_NUMBER:
     while y < USER_NUMBER:
         value = randrange(3)
         userRelationMatrix[x][y] = value
-        print("from:" + x.__str__() + userIdList[x] + " to:" + y.__str__() + userIdList[y] +  " relation:" + RELATION_MAP[value])
+        print("from:" + x.__str__() + " " + userIdList[x] + " to:" + y.__str__() + " " + userIdList[y] +  " relation:" + RELATION_MAP[value])
         if value == 2:
-            print("from:" + y.__str__() + userIdList[x] + " to:" + x.__str__() + userIdList[y] + " relation:" + RELATION_MAP[3])
+            print("from:" + y.__str__() + " " + userIdList[x] + " to:" + x.__str__() + " " + userIdList[y] + " relation:" + RELATION_MAP[3])
 
         if value != 0:
             relation(userIdList[x], userIdList[y], value)

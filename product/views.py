@@ -136,16 +136,16 @@ def friendDelete(request, userfrom, userto):
 def relationGetFriend(request, userid):
 
     user = User.objects.get(base__id=userid)
-    return JsonResponse(User.listUserToJson(user.listFriend.all()), safe=False)
+    return JsonResponse(User.listUserToJson(user, user.listFriend.all()), safe=False)
 
 # /api/friend/getPending
 def relationGetPending(request, userid):
 
     user = User.objects.get(base__id=userid)
-    return JsonResponse(User.listUserToJson(user.listPendRequest.all()), safe=False)
+    return JsonResponse(User.listUserToJson(user, user.listPendRequest.all()), safe=False)
 
 
 # /api/friend/getRequest
 def relationGetRequest(request, userid):
     user = User.objects.get(base__id=userid)
-    return JsonResponse(User.listUserToJson(user.listRequest.all()), safe=False)
+    return JsonResponse(User.listUserToJson(user, user.listRequest.all()), safe=False)
