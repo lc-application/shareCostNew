@@ -17,28 +17,25 @@ from django.conf.urls import url
 from django.conf.urls.static import static
 from django.contrib import admin
 from django.urls import path
-from product.views import hello
-from shareCost import settings
-
-from product.views import userLogin
-from product.views import userCreate
-from product.views import userUpdate
-from product.views import userDelete
-from product.views import userSearch
-
-from product.views import friendRequest
-from product.views import friendConfirm
-from product.views import friendDelete
 
 from product.views import allEvents
-from product.views import joinEvent
 from product.views import eventDetail
-from product.views import removeFromEvent
-
-
+from product.views import friendConfirm
+from product.views import friendDelete
+from product.views import friendRequest
+from product.views import hello
+from product.views import joinEvent
 from product.views import relationGetFriend
 from product.views import relationGetPending
 from product.views import relationGetRequest
+from product.views import removeFromEvent
+from product.views import userCreate
+from product.views import userDelete
+from product.views import userLogin
+from product.views import userSearch
+from product.views import userUpdate
+from shareCost import settings
+
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('hello/', hello),

@@ -1,20 +1,13 @@
 import json
 
 from django.db import IntegrityError
-from django.shortcuts import render
 from django.http import HttpResponse, JsonResponse
 # Create your views here.
-from django.template import RequestContext
-from django.template.context_processors import csrf
-from django.core import files
-from fuzzywuzzy import fuzz
 from fuzzywuzzy import process
 
 from product.models import BaseUser
-from product.models import User
-from product.models import Transaction
-from product.models import Chat
 from product.models import Event
+from product.models import User
 
 
 def hello(request):
