@@ -15,13 +15,17 @@ dependencies:
   - wincertstore=0.2=py37_0
   - pip:
     - babel==2.7.0
+    - chardet==3.0.4
     - django==2.2.4
     - django-phonenumber-field==3.0.1
     - fuzzywuzzy==0.17.0
+    - idna==2.8
     - phonenumbers==8.10.17
     - pillow==6.1.0
     - python-levenshtein==0.12.0
     - pytz==2019.2
+    - requests==2.22.0
     - sqlparse==0.3.0
+    - urllib3==1.25.3
 prefix: D:\Anaconda\envs\newEnv
 
