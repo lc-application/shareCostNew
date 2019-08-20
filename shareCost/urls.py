@@ -24,12 +24,12 @@ from product.views import userLogin
 from product.views import userCreate
 from product.views import userUpdate
 from product.views import userDelete
+from product.views import userSearch
 
 from product.views import friendRequest
 from product.views import friendConfirm
 from product.views import friendDelete
 
-from product.views import friendGet
 from product.views import allEvents
 from product.views import joinEvent
 from product.views import eventDetail
@@ -46,6 +46,7 @@ urlpatterns = [
     path('api/user/usercreate', userCreate),
     path('api/user/userupdate', userUpdate),
     path('api/user/userdelete/<userid>', userDelete),
+    path('api/user/usersearch/<input>', userSearch),
     path('api/friend/request/<userfrom>/<userto>', friendRequest),
     path('api/friend/confirm/<userfrom>/<userto>', friendConfirm),
     path('api/friend/delete/<userfrom>/<userto>', friendDelete),

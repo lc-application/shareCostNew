@@ -7,6 +7,8 @@ from django.http import HttpResponse, JsonResponse
 from django.template import RequestContext
 from django.template.context_processors import csrf
 from django.core import files
+from fuzzywuzzy import fuzz
+from fuzzywuzzy import process
 
 from product.models import BaseUser
 from product.models import User
@@ -82,6 +84,18 @@ def userDelete(request, userid):
 
     BaseUser.objects.filter(id=userid).delete()
     return HttpResponse(status=200)
+
+# /api/user/search
+
+def userSearch(request, input):
+    choices = BaseUser.objects.values_list('userName')
+    filterChoices = process.extract(input, choices, limit=20)
+    result = []
+    for choice in filterChoices:
+        result.append(BaseUser.objects.get(userName=choice[0][0]).json())
+    return HttpResponse(result, status=200)
+
+
 
 # /api/friend/request
 def friendRequest(request, userfrom, userto):
