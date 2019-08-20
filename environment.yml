@@ -1,0 +1,27 @@
+name: newEnv
+channels:
+  - defaults
+dependencies:
+  - ca-certificates=2019.5.15=1
+  - certifi=2019.6.16=py37_1
+  - openssl=1.1.1c=he774522_1
+  - pip=19.2.2=py37_0
+  - python=3.7.4=h5263a28_0
+  - setuptools=41.0.1=py37_0
+  - sqlite=3.29.0=he774522_0
+  - vc=14.1=h0510ff6_4
+  - vs2015_runtime=14.15.26706=h3a45250_4
+  - wheel=0.33.4=py37_0
+  - wincertstore=0.2=py37_0
+  - pip:
+    - babel==2.7.0
+    - django==2.2.4
+    - django-phonenumber-field==3.0.1
+    - fuzzywuzzy==0.17.0
+    - phonenumbers==8.10.17
+    - pillow==6.1.0
+    - python-levenshtein==0.12.0
+    - pytz==2019.2
+    - sqlparse==0.3.0
+prefix: D:\Anaconda\envs\newEnv
+
