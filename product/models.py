@@ -20,6 +20,9 @@ class BaseUser(models.Model):
         }
         return result
 
+    def __str__(self):
+        return 'Base User: ' + self.firstName
+
 
 class Transaction(models.Model):
     fromUser = models.ForeignKey(BaseUser, on_delete=models.DO_NOTHING, related_name='transactionFromUser')
@@ -70,6 +73,7 @@ class Event(models.Model):
     )
     image = models.ImageField(upload_to="EventImage", blank=True, null=True)
     createDate = models.DateTimeField(auto_now_add=True)
+    category= models.CharField(max_length=30)
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
 
     def json(self):
@@ -79,10 +83,21 @@ class Event(models.Model):
             'hostUser':self.hostUser.json(),
             'startTime':self.startTime,
             'endTime':self.endTime,
-            'listUser':self.listUser,
-            'image':self.image.path
+            'listUser':self.listUser
+            # 'image':self.image.path
         }
         return result
+
+    def header(self):
+        return {
+            'title':self.title,
+            'category':self.category,
+            'summary': self.summary,
+            'id': self.id
+        }
+    
+    def __str__(self):
+        return 'Event: ' + self.title
 
 
 class User(models.Model):
@@ -97,10 +112,8 @@ class User(models.Model):
     listRequest = models.ManyToManyField('self')
     listPendRequest = models.ManyToManyField('self')
 
-    listEvent = models.ManyToManyField(
-        Event,
-        blank=True,
-    )
+    def __str__(self):
+        return 'User: ' + self.base.firstName
 
     def baseJson(self):
         return self.base.json()

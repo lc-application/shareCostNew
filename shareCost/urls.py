@@ -29,6 +29,12 @@ from product.views import friendRequest
 from product.views import friendConfirm
 from product.views import friendDelete
 
+from product.views import friendGet
+from product.views import allEvents
+from product.views import joinEvent
+from product.views import eventDetail
+from product.views import removeFromEvent
+
 
 from product.views import relationGetFriend
 from product.views import relationGetPending
@@ -47,6 +53,11 @@ urlpatterns = [
     path('api/friend/getpending/<userid>', relationGetPending),
     path('api/friend/getrequest/<userid>', relationGetRequest),
     url(r'^admin/', admin.site.urls),
+    path('api/event/allEvents', allEvents),
+    path('api/event/joinEvent', joinEvent),
+    path('api/event/eventDetail', eventDetail),
+    path('api/event/removeFromEvent', removeFromEvent)
+
 ]
 
 urlpatterns += static(settings.MEDIA_URL, document_root = settings.MEDIA_ROOT)
